@@ -33,3 +33,31 @@ face_box = None
 faces = face_cascade.detectMultiScale(gray, 1.1, 3)
 if len(faces) > 0:
     face_box = max(faces, key=lambda item: item[2] * item[3])
+
+if detect_face and face_box is not None:
+    x, y, w, h = face_box
+    cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 255), 3)
+    roi_x = int(x + w * 0.14)
+    roi_y = int(y + h * 0.25)
+    roi_w = int(w * 0.3)
+    roi_h = int(h * 0.3)
+
+    cv2.rectangle(image, (roi_x, roi_y), (roi_x + roi_w, roi_y + roi_h), (255, 0, 0), 2)
+    row, col = tracker.find_eye_center(gray[roi_y:roi_y + roi_h, roi_x:roi_x + roi_w])
+    print row, col
+
+    cv2.circle(image, (roi_x + col, roi_y + row), 10, (0, 255, 0), -1)
+
+    roi_x = x + w - roi_w - int(w * 0.13)
+    cv2.rectangle(image, (roi_x, roi_y), (roi_x + roi_w, roi_y + roi_h), (255, 255, 0), 2)
+    row, col = tracker.find_eye_center(gray[roi_y:roi_y + roi_h, roi_x:roi_x + roi_w])
+    print row, col
+
+    cv2.circle(image, (roi_x + col, roi_y + row), 10, (0, 255, 0), -1)
+
+else:
+    pass
+
+cv2.imshow("Output", utils.image_resize(image, height=600))
+cv2.waitKey()
+cv2.destroyAllWindows()
